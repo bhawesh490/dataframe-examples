@@ -1,6 +1,5 @@
 import boto3
 
-
 def lambda_handler(event, context):
 
     client = boto3.client('emr',  region_name="eu-west-1")

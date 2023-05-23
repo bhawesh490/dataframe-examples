@@ -12,8 +12,13 @@ if __name__ == '__main__':
         .builder \
         .appName("DataFrames examples") \
         .config('spark.jars.packages', 'org.apache.hadoop:hadoop-aws:2.7.4') \
-        .master('local[*]') \
         .getOrCreate()
+    
+    # .master('local[*]') \
+
+    # earlier in rdd examples we have used config differently
+    # also note .master(('local')) it means we have executed this in local if we want to execute this in master 
+    # we need to use it during spark_submit 
 
     spark.sparkContext.setLogLevel("ERROR")
     current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -21,9 +26,12 @@ if __name__ == '__main__':
     app_secrets_path = os.path.abspath(current_dir + "/../../../" + ".secrets")
 
     conf = open(app_config_path)
+    # dictformat
     app_conf = yaml.load(conf, Loader=yaml.FullLoader)
     secret = open(app_secrets_path)
+    # dict format
     app_secret = yaml.load(secret, Loader=yaml.FullLoader)
+
 
     # Setup spark to use s3
     hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
@@ -67,6 +75,8 @@ if __name__ == '__main__':
         .repartition(10, txn_fct_df["merchant_id"]) \
         .groupBy("merchant_id") \
         .agg(sum("amount"), approx_count_distinct("status"))
+    
+    # observe how repartitioning is done on the basis of group by key
 
     txnAggDf.show(5, False)
 
