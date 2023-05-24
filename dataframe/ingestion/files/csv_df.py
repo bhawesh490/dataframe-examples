@@ -35,6 +35,8 @@ if __name__ == '__main__':
         .add("has_financial_dependents", BooleanType(), True) \
         .add("has_student_loans", BooleanType(), True) \
         .add("income", DoubleType(), True)
+    
+    # earlier we saw usage of structfield 
 
     fin_df = spark.read \
         .option("header", "false") \
@@ -42,6 +44,8 @@ if __name__ == '__main__':
         .format("csv") \
         .schema(fin_schema) \
         .load("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/finances.csv")
+    
+    # in case we are reading from dataframe we load option will be blank
 
     fin_df.printSchema()
     fin_df.show()
@@ -55,6 +59,10 @@ if __name__ == '__main__':
         .option("inferSchema", "true") \
         .csv("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/finances.csv") \
         .toDF("id", "has_debt", "has_financial_dependents", "has_student_loans", "income")
+    
+    # here we have used todf not because we have to convert rdd to df but rather we need to specify column names
+    # also if .option("header","true") and we use toDF then it will change to column name as specified in toDF
+    # in short if todf function is called on top of a dataframe its used to change the column name or assign column names
 
     print("Number of partitions = " + str(fin_df.rdd.getNumPartitions()))
     finance_df.printSchema()
@@ -64,7 +72,7 @@ if __name__ == '__main__':
         .repartition(2) \
         .write \
         .partitionBy("id") \
-        .mode("overwrite") \
+        .mode("append") \
         .option("header", "true") \
         .option("delimiter", "~") \
         .csv("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/fin")
@@ -72,3 +80,5 @@ if __name__ == '__main__':
     spark.stop()
 
 # spark-submit --packages "org.apache.hadoop:hadoop-aws:2.7.4" dataframe/ingestion/files/csv_df.py
+# .mode has 4 values 
+# overwrite,append,error if exists,ignore

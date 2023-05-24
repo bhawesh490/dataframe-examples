@@ -33,9 +33,10 @@ if __name__ == '__main__':
     nyc_omo_df = spark.read \
         .parquet("s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/NYC_OMO") \
         .repartition(5)
+    # in realtime we generally use this repartition when ever we are reading the file
 
     print("# of records = " + str(nyc_omo_df.count()))
-    print("# of partitions = " + str(nyc_omo_df.rdd.getNumPartitions))
+    print("# of partitions = " + str(nyc_omo_df.rdd.getNumPartitions()))
 
     nyc_omo_df.printSchema()
 
