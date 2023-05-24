@@ -1,7 +1,8 @@
 from pyspark.sql import SparkSession
 import yaml
 import os.path
-
+# sftp is used as secured file transfer protocol used by different vendors
+# sftp is kind of folder which is shared over the internet
 if __name__ == '__main__':
     # Create the SparkSession
     spark = SparkSession \
@@ -30,6 +31,8 @@ if __name__ == '__main__':
         .option("fileType", "csv")\
         .option("delimiter", "|")\
         .load(app_conf["sftp_conf"]["directory"] + "/receipts_delta_GBR_14_10_2017.csv")
+    # .option will read pem file 
+    # host is the dns name
 
     ol_txn_df.show(5, False)
 
